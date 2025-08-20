@@ -16,7 +16,7 @@ class AnyskinSensorPublisher(Node):
         self.sensor_stream = AnySkinProcess(num_mags=5, port='/dev/ttyACM0')  # Set your port
         self.sensor_stream.start()
         self.baseline = self.get_baseline()
-        self.timer = self.create_timer(0.01, self.publish_measurements)  # 100 Hz
+        self.timer = self.create_timer(0.005, self.publish_measurements)  # 200 Hz
         self.get_logger().info("Anyskin Sensor Publisher Node started.")
         self.baseline_srv = self.create_service(Trigger, 'reset_baseline', self.reset_baseline_callback)
 
@@ -55,7 +55,7 @@ class AnyskinSensorPublisher(Node):
             msg = Float32MultiArray()
             msg.data = [float(avg_mag)]  # or publish processed data
             self.publisher_.publish(msg)
-            self.get_logger().info(f"Published: {msg.data}")
+            # self.get_logger().info(f"Published: {msg.data}")
 
 def main(args=None):
     rclpy.init(args=args)

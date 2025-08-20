@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Float32MultiArray
-from sync_node.msg import SyncData
+from custom_interfaces.msg import SyncData
 from collections import deque
 
 class SyncNode(Node):
@@ -10,8 +10,9 @@ class SyncNode(Node):
         super().__init__('sync_node')
         self.pose_buffer = deque(maxlen=100)  # Store recent poses
         self.publisher_ = self.create_publisher(SyncData, '/synced_data', 10)
-        self.create_subscription(PoseStamped, '/ee_pose', self.ee_pose_callback, 10)
+        self.create_subscription(PoseStamped, '/ee_pose_fast', self.ee_pose_callback, 10)
         self.create_subscription(Float32MultiArray, '/anyskin_measurements', self.measurements_callback, 10)
+        self.get_logger().info('Data synchronizer node started')
 
     def ee_pose_callback(self, msg):
         # Store pose with its timestamp
@@ -36,7 +37,7 @@ class SyncNode(Node):
             out_msg.ee_pose = closest_pose
             out_msg.measurements = msg
             self.publisher_.publish(out_msg)
-            self.get_logger().info('Published sensor-triggered synced data')
+            # self.get_logger().info('Published sensor-triggered synced data')
         else:
             self.get_logger().warn('No pose available for current measurement')
 

@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'sync_node'
+package_name = 'sync_data'
 
 setup(
     name=package_name,
@@ -17,12 +17,10 @@ setup(
     maintainer_email='gustave.loof@gmail.com',
     description='TODO: Package description',
     license='TODO: License declaration',
+    # tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'sync_node = sync_node.sync_node:main',
+            'sync_data = sync_data.sync_data:main',
         ],
-    },
-    package_data={
-        'sync_node': ['msg/SyncData.msg'],
     },
 )
