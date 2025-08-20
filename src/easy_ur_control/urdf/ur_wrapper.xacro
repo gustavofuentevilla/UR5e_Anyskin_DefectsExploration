@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<robot name="ur_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+    <!-- Parameters -->
+    <xacro:arg name="ur_type" default="ur20" />
+    <xacro:arg name="joint_limit_parameters_file"
+        default="$(find ur_description)/config/$(arg ur_type)/joint_limits.yaml" />
+    <xacro:arg name="kinematics_parameters_file"
+        default="$(find ur_description)/config/$(arg ur_type)/default_kinematics.yaml" />
+    <xacro:arg name="physical_parameters_file"
+        default="$(find ur_description)/config/$(arg ur_type)/physical_parameters.yaml" />
+    <xacro:arg name="visual_parameters_file"
+        default="$(find ur_description)/config/$(arg ur_type)/visual_parameters.yaml" />
+
+    <xacro:arg name="robot_ip" default="0.0.0.0" />
+    <xacro:arg name="headless_mode" default="false" />
+    <xacro:arg name="ur_script_filename"
+        default="$(find ur_client_library)/resources/external_control.urscript" />
+    <xacro:arg name="ur_output_recipe_filename"
+        default="$(find ur_robot_driver)/resources/rtde_output_recipe.txt" />
+    <xacro:arg name="ur_input_recipe_filename"
+        default="$(find ur_robot_driver)/resources/rtde_input_recipe.txt" />
+    <xacro:arg name="use_mock_hardware" default="false" />
+    <xacro:arg name="mock_sensor_commands" default="false" />
+
+    <!-- Include the UR robot macro and ros2_control tag from the driver -->
+    <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro" />
+    <xacro:include filename="$(find ur_robot_driver)/urdf/ur.ros2_control.xacro" />
+    <!-- URDF root -->
+    <link name="world" />
+
+    <!-- Instantiate the UR robot, WORLD frame definition -->
+    <xacro:ur_robot
+        name="$(arg ur_type)"
+        tf_prefix="$(arg ur_type)_"
+        parent="world"
+        joint_limits_parameters_file="$(arg joint_limit_parameters_file)"
+        kinematics_parameters_file="$(arg kinematics_parameters_file)"
+        physical_parameters_file="$(arg physical_parameters_file)"
+        visual_parameters_file="$(arg visual_parameters_file)"
+    >
+        <origin xyz="0.460 0.436 0.910" rpy="3.14159 0 0" />
+    </xacro:ur_robot>
+
+    <xacro:ur_ros2_control
+        name="$(arg ur_type)"
+        tf_prefix="$(arg ur_type)_"
+        kinematics_parameters_file="$(arg kinematics_parameters_file)"
+        robot_ip="$(arg robot_ip)"
+        script_filename="$(arg ur_script_filename)"
+        output_recipe_filename="$(arg ur_output_recipe_filename)"
+        input_recipe_filename="$(arg ur_input_recipe_filename)"
+        use_mock_hardware="$(arg use_mock_hardware)"
+        mock_sensor_commands="$(arg mock_sensor_commands)"
+        headless_mode="$(arg headless_mode)"
+    />
+
+    <xacro:include filename="$(find sensor_description)/urdf/ur_sensor.xacro" />
+    <joint name="sensor_joint" type="fixed">
+        <parent link="$(arg ur_type)_tool0" />
+        <child link="sensor_link" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <!-- <link name="sensor_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://sensor_description/meshes/AnySkinToRobot_mesh.stl"/>
+      </geometry>
+      <material name="Gray">
+        <color rgba="0.6 0.6 0.6 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://sensor_description/meshes/AnySkinToRobot_mesh.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.090"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="28343.86861e-9" ixy="-2.25189e-9" ixz="-146.37387e-9"
+               iyy="29559.43462e-9" iyz="1.70533e-9"
+               izz="24658.37874e-9"/>
+    </inertial>
+    </link>
+
+    <link name="ee_link"/>
+    <joint name="sensor_to_ee" type="fixed">
+        <parent link="sensor_link"/>
+        <child link="ee_link"/>
+        <origin xyz="0 0 0.0505" rpy="0 0 0"/>
+    </joint> -->
+
+</robot>
+
+<!-- Include your custom gripper and add the joint to connect to it, then go to the
+    ur_controllers.yaml and change the ee link in the controller parameters -->
+
+<!-- <xacro:include filename="$(find gripper_description)/urdf/ur_gripper.xacro" />
+<joint name="example_gripper_joint" type="fixed">
+    <parent link="tool0" />
+    <child link="gripper_link" />
+    <origin xyz="0 0 0.0505" rpy="0 0 0" />
+</joint> -->
